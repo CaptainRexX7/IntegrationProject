@@ -162,8 +162,8 @@ void setup() {
   //Gripper
   Gripper.attach(39);//setting gripper pin, !!changed to digital based on the servo calibration code!! 
   Arm.attach(38);//setting the arm pin, !!changes to digital!!
-  MoveArm(RestingArm); //Sets gripper arm postion
-  MoveGripper(Open); //sets gripper hand postion
+  //MoveArm(RestingArm); //Sets gripper arm postion
+  //MoveGripper(Open); //sets gripper hand postion
 
   //force sensor
   pinMode(forceSensor, INPUT);
@@ -172,8 +172,8 @@ void setup() {
 }
 
 void loop() {
-  Arm.write(armAngle);  
-  Gripper.write(handAngle);
+  //Arm.write(armAngle);  
+  //Gripper.write(handAngle);
   //Ensures the gripper stays in the last set position
 
   switch (state){
@@ -200,7 +200,7 @@ void loop() {
         Stop();
         if(firstTime){
           firstTime = 0;
-          state = PlaceBox;
+          state = End; //PlaceBox;
         }
         else{           //The second time this code runs will end the program arriving back at the first green line.
           state = End;
@@ -220,7 +220,7 @@ void loop() {
     break;
 
     default:
-      state = FindBox;
+      state = FollowLine;//FindBox;
     break;
   }
 }
