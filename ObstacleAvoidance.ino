@@ -62,12 +62,12 @@ char isColorR = 0;    char isColorL = 0;
 //front ultrasonic sensor
 long duration1;
 int distance1;
-int targetDistance1;
+int targetDistance1 = 15;
 
 //side ultrasonic sensor
 long duration2;
 int distance2;
-int targetDistance2;
+int targetDistance2 = 15;
 
 //States
 enum {FindBoundary,FindGap,Choice,End};
@@ -103,6 +103,9 @@ void setup() {
   pinMode(trigPin2, OUTPUT);// I added this line to account for the other color sensor, it needs to be determined if the color sensor is the fron or the side one 
   pinMode(echoPin2, INPUT);
 
+  state = Choice;
+
+  Serial.begin(115200);
 }
 
 void loop() {
@@ -149,6 +152,7 @@ void loop() {
     break;
 
     case End:
+    Stop();
     break;
 
     default:
@@ -230,6 +234,7 @@ int FrontUltrasonic()
   digitalWrite(trigPin1, LOW);
   duration1 = pulseIn(echoPin1, HIGH);
   distance1 = duration1 * 0.034 / 2;
+  Serial.println(distance1);
   return distance1;
 }
 
@@ -240,9 +245,9 @@ int SideUltrasonic()
   digitalWrite(trigPin1, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin1, LOW);
-  duration1 = pulseIn(echoPin1, HIGH);
-  distance1 = duration1 * 0.034 / 2;
-  return distance1;
+  duration2 = pulseIn(echoPin1, HIGH);
+  distance2 = duration2 * 0.034 / 2;
+  return distance2;
 }
 
 void Stop() {
@@ -256,23 +261,13 @@ void Forward() {
   analogWrite(ENA, PWMvalR);
   analogWrite(ENB, PWMvalL);
 
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-}
-
-void RotateRt() {
-  analogWrite(ENA, PWMvalR);
-  analogWrite(ENB, PWMvalL);
-
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
 }
 
-void RotateLft() {
+void RotateRt() {
   analogWrite(ENA, PWMvalR);
   analogWrite(ENB, PWMvalL);
 
@@ -280,6 +275,16 @@ void RotateLft() {
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
+}
+
+void RotateLft() {
+  analogWrite(ENA, PWMvalR);
+  analogWrite(ENB, PWMvalL);
+
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
 }
 
 void Backward()
@@ -287,8 +292,8 @@ void Backward()
   analogWrite(ENA, PWMvalR);
   analogWrite(ENB, PWMvalL);
 
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
 } 
