@@ -1,12 +1,11 @@
-
 #include <Servo.h>
 
 //Right Color Sensor, CS1, right sensor
 #define RS0 28
 #define RS1 29
 #define RS2 30
-#define RS3 31
-#define RSOut 32
+#define RS3 7
+#define RSOut 12
 
 //Left Color Sensor, CS2, left sensor 
 #define LS0 33
@@ -16,28 +15,28 @@
 #define LSOut 37
 
 //Arm Color Sensor, CS3, the sensor on the top of the gripper 
-#define AS0 13
+#define AS0 17
 #define AS1 14
 #define AS2 15
 #define AS3 16
-#define ASOut 17
+#define ASOut 13
 
 // Analog values for colors
 //this may need recalibration depending on tests but hasnt been changed yet 
 //CS1
-#define RredMin 89
-#define RredMax 110
-#define RgreenMin 138
-#define RgreenMax 145
-#define RblueMin 135
-#define RblueMax 150
+#define RredMin 140
+#define RredMax 610
+#define RgreenMin 160
+#define RgreenMax 730
+#define RblueMin 160
+#define RblueMax 620
 //CS2
-#define LredMin 100
-#define LredMax 115
-#define LgreenMin 139
-#define LgreenMax 150
-#define LblueMin 130
-#define LblueMax 145
+#define LredMin 170
+#define LredMax 740
+#define LgreenMin 180
+#define LgreenMax 920
+#define LblueMin 170
+#define LblueMax 810
 //CS3
 #define AredMin 90
 #define AredMax 160
@@ -78,10 +77,10 @@
 #define forceValue 25
 
 //Timing
-#define speedR 10 //slowed down to give the ligth sensors more time to read
-#define speedL 10 //slowed down to give the ligth sensors more time to read
+#define speedR 22 //slowed down to give the light sensors more time to read
+#define speedL 22 //slowed down to give the light sensors more time to read
 #define waitTime 1450
-#define turnTime 1380
+#define turnTime 3000
 #define time1 1000
 #define time2 1000
 
@@ -121,6 +120,7 @@ char isBlue = 0; //0 = red, 1 = blue
 
 //FollowLine setting   checks if FollowLine state has ran twice
 char firstTime = 1;
+char firstTurn = 1;
 
 //States  removed return to simplfy code
 enum {FindBox, FollowLine, PlaceBox, End}; //I removed the return state
@@ -168,6 +168,8 @@ void setup() {
   //force sensor
   pinMode(forceSensor, INPUT);
 
+  state = FollowLine;
+
   //Serial.begin(115200); Temporary. Used for testing
 }
 
@@ -195,7 +197,12 @@ void loop() {
     //"break" moves on to the next segment 
 
     case FollowLine:
-      followLine();
+      if(firstTurn){
+        followLine(turnTime);
+      }
+      else{
+        followLine(turnTime/2);
+      }
       if(LeftSensor() == 2 && RightSensor() == 2){ //when these conditions are met it will be at the green line 
         Stop();
         if(firstTime){
@@ -216,7 +223,8 @@ void loop() {
     break;
 
     case End:
-    Stop();
+    Forward();
+    //Stop();
     break;
 
     default:
@@ -258,19 +266,21 @@ void findBox()
   }
 }
 
-void followLine() 
+void followLine(int time) 
 {
-  if(LeftSensor() == 1 && !(RightSensor() == 1)){ //if the left sensor detects the line color but the right does not 
-    Forward();
+  if(LeftSensor() == 1 && !(RightSensor() == 1)){ //if the left sensor detects the line color but the right does not
+    Stop(); 
     delay(waitTime);
     RotateLft();
-    delay(turnTime);
+    delay(time);
+    firstTurn = 0;
   } 
   else if(!(LeftSensor() == 1) && RightSensor() == 1){ //if the right sensor detects the line color but the left does not
-    Forward();
+    Stop();
     delay(waitTime);
     RotateRt();
-    delay(turnTime);
+    delay(time);
+    firstTurn = 0;
   }
   else if(LeftSensor() == 1 && RightSensor() == 1){ //if both detect the color, choose which way to go to place the box 
     Forward();
@@ -279,7 +289,7 @@ void followLine()
       RotateRt();
     else
       RotateLft();
-    delay(turnTime);
+    delay(time);
   }
   else{
     Forward();
@@ -300,7 +310,7 @@ void placeBox()
     delay(2*turnTime); //turn around
   }
   else{
-    followLine();
+    followLine(turnTime);
   }
 }
 
@@ -444,8 +454,8 @@ void Forward() {
 }
 
 void RotateRt() {
-  analogWrite(ENA, PWMvalR);
-  analogWrite(ENB, PWMvalL);
+  analogWrite(ENA, PWMvalR*2);
+  analogWrite(ENB, PWMvalL*2);
 
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
@@ -454,8 +464,8 @@ void RotateRt() {
 }
 
 void RotateLft() {
-  analogWrite(ENA, PWMvalR);
-  analogWrite(ENB, PWMvalL);
+  analogWrite(ENA, PWMvalR*2);
+  analogWrite(ENB, PWMvalL*2);
 
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
