@@ -24,19 +24,19 @@
 // Analog values for colors
 //this may need recalibration depending on tests but hasnt been changed yet 
 //CS1
-#define RredMin 125
-#define RredMax 200
+#define RredMin 150
+#define RredMax 180
 #define RgreenMin 150
-#define RgreenMax 180
+#define RgreenMax 170
 #define RblueMin 155
-#define RblueMax 200
+#define RblueMax 180
 //CS2
-#define LredMin 120
-#define LredMax 180
-#define LgreenMin 140
-#define LgreenMax 170
-#define LblueMin 155
-#define LblueMax 200
+#define LredMin 150
+#define LredMax 190
+#define LgreenMin 155
+#define LgreenMax 175
+#define LblueMin 150
+#define LblueMax 175
 //CS3
 #define AredMin 15 //65 //90
 #define AredMax 55 //80 //160
