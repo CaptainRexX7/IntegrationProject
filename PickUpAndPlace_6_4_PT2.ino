@@ -66,15 +66,15 @@
 
 //Gripper Moved from int variables to defines to save memory 
 #define RestingArm 210 //changed
-#define WorkingArm 179 //changed 45
+#define WorkingArm 180 //changed 45
 #define SmallBox 77
-#define LargeBox 95
+#define LargeBox 85
 #define Open 125 //open=115, smallbox=, largebox=95
 #define targetDistance 11 // the vehicle needs to be within 10cm
 
 //Force sensor
 #define forceSensor A9 //changed
-#define forceValue 25
+#define forceValue 65
 
 //Timing
 #define speedR 25 //slowed down to give the light sensors more time to read
@@ -174,7 +174,7 @@ void setup() {
 
   state = FindBox;//PlaceBox;
 
-  //Serial.begin(9600); //Temporary. Used for testing
+  Serial.begin(9600); //Temporary. Used for testing
 }
 
 void loop() {
@@ -238,10 +238,14 @@ void findBox()
       if(isRed){ //this is sensing for red if not red then it is blue 
         RotateRt();
         delay(turnTime1);
-        //MoveGripper(SmallBox);
+        LeftSensor();
+        RightSensor();
+        //Serial.println('here!1')
+        MoveGripper(SmallBox);
         //delay(1500);
         if(isColorR == 1 || isColorL == 1){ // if the left color sensor detects a color
         //  MoveGripper(SmallBox); 
+          //Serial.println('here!1')
           RotateRt();
           delay(turnTime1);
           Stop();
@@ -250,6 +254,8 @@ void findBox()
         }
         else{
           Forward();
+          LeftSensor();
+          RightSensor();
         }  
       }
       else{
